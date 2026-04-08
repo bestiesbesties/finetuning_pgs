@@ -1,0 +1,15 @@
+http://host.docker.internal:8081/inference
+POST
+text {{ text }}
+
+Publieke verantwoording begrippen vormen en beoordelingskaders in Bovens, M en T. Schillemans, Handboek publieke verantwoording. Den haag.
+
+[
+{% for item in input %}
+  {
+    "label": "{{ item.label }}",
+    "start_offset": {{ item.start_offset }},
+    "end_offset": {{ item.end_offset }}
+  }{% if not loop.last %},{% endif %}
+{% endfor %}
+]
