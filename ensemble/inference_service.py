@@ -1,20 +1,22 @@
 from flask import Flask, request, jsonify 
-from transformers import pipeline, Pipeline
+from transformers import pipeline, Pipeline, AutoModelForTokenClassification, AutoToken
 
-def load_model(hf_modelname) -> Pipeline:
+def load_encoder(hf_modelname) -> Pipeline:
+
     return pipeline(
                 "ner", 
                 model=hf_modelname,
-                aggregation_strategy="simple"
+                aggregation_strategy = "simple"
                 )
 
-# bert = load_model("Davlan/bert-base-multilingual-cased-ner-hrl") ##GOOGLE
-# roberta = load_model("LecJackS/xlm-roberta-base-finetuned-conll2003") ## FACEBOOK
-
-model_pipeline = load_model("Davlan/bert-base-multilingual-cased-ner-hrl") 
+models = [
+    load_encoder("Davlan/bert-base-multilingual-cased-ner-hrl"),
+    load_encoder("FacebookAI/xlm-roberta-large-finetuned-conll03-english"),
+    load_encoder("51la5/roberta-large-NER")
+]
 
 def inference(text:str):
-    return model_pipeline(text)
+    return models[i](text)
 
 app = Flask(__name__)
 
@@ -24,13 +26,16 @@ def inference_endpoint():
     print("data: ", data)
     text = data.get("text", "")
     print("text: ", text)
-    ents = inference(text)
+    ents = [ model(text) for model in models ]
+
+    print("ents:", ents)
     print("len(ents): ", len(ents))
 
     structure = [{
         "label" : ent["entity_group"],
         "start_offset" : ent["start"] ,
-        "end_offset" : ent["end"]
+        "end_offset" : ent["end"],
+        "confidence" : ent["score"]
     }
     for ent in ents
     ]
