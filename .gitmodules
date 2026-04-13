@@ -1,0 +1,6 @@
+[submodule "models/bert-base-multilingual-cased-ner-hrl"]
+	path = models/bert-base-multilingual-cased-ner-hrl
+	url = https://huggingface.co/Davlan/bert-base-multilingual-cased-ner-hrl
+[submodule "models/wikineural-multilingual-ner"]
+	path = models/wikineural-multilingual-ner
+	url = https://huggingface.co/Babelscape/wikineural-multilingual-ner
