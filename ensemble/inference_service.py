@@ -1,46 +1,58 @@
 from flask import Flask, request, jsonify 
-from transformers import pipeline, Pipeline, AutoModelForTokenClassification, AutoToken
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+import torch 
+import os
+BATCH = 0
 
-def load_encoder(hf_modelname) -> Pipeline:
+def printer(iterable):
+    for i, x in enumerate(iterable):
+        print(i, x, "\n")
 
-    return pipeline(
-                "ner", 
-                model=hf_modelname,
-                aggregation_strategy = "simple"
-                )
+class Encoder():
+    def __init__(self, model_name):    
+        self.model_name = model_name
+        self.model_path = self._scope_model_path(self.model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, local_files_only=True)
+        self.model = AutoModelForTokenClassification.from_pretrained(self.model_path, local_files_only=True)
+
+    def _scope_model_path(self, model_name) -> str:
+        model_path = "./models/" +  model_name
+        print("model_path: ", model_path)
+        if not os.path.exists(model_path):
+            raise RuntimeError(f"'model' not in models folder")
+        return model_path
+    
+    def forward(self, t:str):
+        inputs = self.tokenizer(t, return_tensors="pt", truncation=True, padding=True)
+        tokens = self.tokenizer.convert_ids_to_tokens(inputs.input_ids[BATCH])
+        with torch.no_grad():
+            outputs = self.model(**inputs, output_hidden_states=True)
+        return (tokens, outputs.logits[BATCH])
 
 models = [
-    load_encoder("Davlan/bert-base-multilingual-cased-ner-hrl"),
-    load_encoder("FacebookAI/xlm-roberta-large-finetuned-conll03-english"),
-    load_encoder("51la5/roberta-large-NER")
+    Encoder("bert-base-multilingual-cased-ner-hrl"),
+    Encoder("wikineural-multilingual-ner")
 ]
 
-def inference(text:str):
-    return models[i](text)
-
 app = Flask(__name__)
-
 @app.route("/inference", methods = ["POST"])
 def inference_endpoint():
     data = request.get_json()
-    print("data: ", data)
     text = data.get("text", "")
-    print("text: ", text)
-    ents = [ model(text) for model in models ]
+    ios = [ model.forward(text) for model in models] ## TODO check of chronologische volgorde altijd hetzelfde blijft
+    
+    for i, io in enumerate(ios):
+        print(i)
+        print("len(io[0]): ", len(io[0]))
+        print("len(io[1]): ", len(io[1]))
 
-    print("ents:", ents)
-    print("len(ents): ", len(ents))
-
-    structure = [{
-        "label" : ent["entity_group"],
-        "start_offset" : ent["start"] ,
-        "end_offset" : ent["end"],
-        "confidence" : ent["score"]
-    }
-    for ent in ents
-    ]
-    ##?universeel terwijl tokenizer in transformer?...
-    print("structure: ", structure)
+    structure = {}
+    for model, io in zip(models, ios):
+        structure[model.model_name] =  {
+            "tokens" : io[0],
+            "logits" :  io[1].detach().cpu().tolist()
+        }
+    
     return jsonify(structure)
 
 if __name__ == "__main__":
