@@ -3,3 +3,5 @@ flask
 transformers
 torch
 pandas
+spacy
+./models/nl_core_news_lg-3.8.0-py3-none-any.whl
