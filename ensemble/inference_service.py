@@ -23,15 +23,17 @@ class Encoder():
         return model_path
     
     def forward(self, t:str):
-        inputs = self.tokenizer(t, return_tensors="pt", truncation=True, padding=True)
+        inputs = self.tokenizer(t, return_tensors="pt", truncation=True, padding=True,  return_offsets_mapping=True)
         tokens = self.tokenizer.convert_ids_to_tokens(inputs.input_ids[BATCH])
+        offsets = inputs.offset_mapping[BATCH].tolist()
         with torch.no_grad():
             outputs = self.model(**inputs, output_hidden_states=True)
-        return (tokens, outputs.logits[BATCH])
+        return (tokens, offsets, outputs.logits[BATCH])
 
 models = [
     Encoder("bert-base-multilingual-cased-ner-hrl"),
-    Encoder("wikineural-multilingual-ner")
+    Encoder("wikineural-multilingual-ner"),
+    Encoder("xlm-roberta-large-ner-hrl-ft")
 ]
 
 app = Flask(__name__)
@@ -40,19 +42,19 @@ def inference_endpoint():
     data = request.get_json()
     text = data.get("text", "")
     ios = [ model.forward(text) for model in models] ## TODO check of chronologische volgorde altijd hetzelfde blijft
-    
+
     for i, io in enumerate(ios):
-        print(i)
-        print("len(io[0]): ", len(io[0]))
-        print("len(io[1]): ", len(io[1]))
+        print(i, "len(io[0]): ", len(io[0]), "len(io[1]): ", len(io[1]), "len(io[2]): ", len(io[2]))
+
 
     structure = {}
     for model, io in zip(models, ios):
         structure[model.model_name] =  {
             "tokens" : io[0],
-            "logits" :  io[1].detach().cpu().tolist()
+            "offsets" : io[1],
+            "logits" :  io[2].detach().cpu().tolist()
         }
-    
+    print(jsonify(structure))
     return jsonify(structure)
 
 if __name__ == "__main__":
