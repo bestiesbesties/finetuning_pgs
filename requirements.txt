@@ -1,6 +1,9 @@
 tika
 flask
 transformers
+tiktoken
+SentencePiece
+protobuf
 torch
 pandas
 spacy
