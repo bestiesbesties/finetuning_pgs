@@ -30,5 +30,5 @@ def _save_confidence_dist(data):
     ax.set_xlim(0, 1)
     ax.set_yticks([])
     plt.tight_layout()
-    plt.savefig(os.path.join("data","temp_confidence_histogram.png"))
+    plt.savefig(os.path.join("temp", "temp_confidence_histogram.png"))
     plt.close(fig)
