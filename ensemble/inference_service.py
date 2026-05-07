@@ -33,7 +33,7 @@ class Encoder():
 models = [
     Encoder("bert-base-multilingual-cased-ner-hrl"),
     Encoder("wikineural-multilingual-ner"),
-    Encoder("xlm-roberta-large-ner-hrl-ft")
+    Encoder("xlm-roberta-large-ner-hrl")
 ]
 
 app = Flask(__name__)
@@ -54,7 +54,7 @@ def inference_endpoint():
             "offsets" : io[1],
             "logits" :  io[2].detach().cpu().tolist()
         }
-    print(jsonify(structure))
+    print(structure[list(structure.keys())[0]])
     return jsonify(structure)
 
 if __name__ == "__main__":
