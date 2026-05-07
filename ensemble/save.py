@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 
 def cache_tokens_detail(tokens_detail:list) -> None:
     df = pd.DataFrame(tokens_detail, columns=["model_index", "token_index", "token", "span", "probs", "entropy", "label"])
-    df.to_csv(os.path.join("data", "temp_token_details.csv"), index=False)
+    df.to_csv(os.path.join("temp", "temp_token_details.csv"), index=False)
 
 
 def export_sequence_detail(sequence_detail: list) -> None:
-    fp = os.path.join("data", "temp_sequence_details.csv")
+    fp = os.path.join("temp", "temp_sequence_details.csv")
     new_row = pd.DataFrame(
         [sequence_detail],
         columns=["text", "tags", "confidence"]

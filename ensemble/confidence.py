@@ -62,7 +62,7 @@ def mean(entropies):
     return sum(entropies) / len(entropies)
 
 def calculate_confidence(text, MAX_ENTROPY):
-    df = pd.read_csv(os.path.join("data", "temp_token_details.csv"))
+    df = pd.read_csv(os.path.join("temp", "temp_token_details.csv"))
     model_preds = []
     model_entropies = []
     for model_index in range(0, MODEL_COUNT):
