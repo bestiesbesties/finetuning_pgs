@@ -18,4 +18,4 @@ print("words_median: ", words_median)
 df = df[df["words_length"] <= words_median * 2]
 print("len(df): ", len(df))
 df.drop(["chars_length", "words_length"], axis=1, inplace=True)
-df.to_csv(os.path.join("data", "parsed-pgs33_pruned.csv"))
+df.to_csv(os.path.join("data", "parsed-pgs33_pruned.csv"), index=False)
