@@ -14,6 +14,8 @@ class Encoder():
         self.model_path = self._scope_model_path(self.model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, local_files_only=True)
         self.model = AutoModelForTokenClassification.from_pretrained(self.model_path, local_files_only=True)
+        print("model_class: ", self.model.__class__)
+        print("model: ", self.model)
 
     def _scope_model_path(self, model_name) -> str:
         model_path = "./models/" +  model_name
