@@ -14,6 +14,8 @@ class Encoder():
         self.model_path = self._scope_model_path(self.model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, local_files_only=True)
         self.model = AutoModelForTokenClassification.from_pretrained(self.model_path, local_files_only=True)
+        print("model_class: ", self.model.__class__)
+        print("model: ", self.model)
 
     def _scope_model_path(self, model_name) -> str:
         model_path = "./models/" +  model_name
@@ -33,7 +35,7 @@ class Encoder():
 models = [
     Encoder("bert-base-multilingual-cased-ner-hrl"),
     Encoder("wikineural-multilingual-ner"),
-    Encoder("xlm-roberta-large-ner-hrl-ft")
+    Encoder("xlm-roberta-large-ner-hrl")
 ]
 
 app = Flask(__name__)
@@ -54,7 +56,7 @@ def inference_endpoint():
             "offsets" : io[1],
             "logits" :  io[2].detach().cpu().tolist()
         }
-    print(jsonify(structure))
+    print(structure[list(structure.keys())[0]])
     return jsonify(structure)
 
 if __name__ == "__main__":
