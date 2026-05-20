@@ -12,6 +12,6 @@ while True:
     text = input(":")
     if text == "":
         text = df.sample(1)["text"].to_list()[0]
-    tokens_detail = infer .infer(text)
+    tokens_detail = infer.infer(text)
     sequence_details  = confidence.calculate_confidence(text, MAX_ENTROPY)
     save.export_sequence_detail(sequence_details)
