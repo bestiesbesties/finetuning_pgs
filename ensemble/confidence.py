@@ -68,7 +68,6 @@ def calculate_confidence(text, MAX_ENTROPY):
     for model_index in range(0, MODEL_COUNT):
         df_copy = df[df["model_index"] == model_index]
         groups = bio_to_groups(df_copy)
-        print("groups: ", groups)
         model_pred = groups_to_entities(groups, df_copy)
         model_preds.append(model_pred)
         entropies = df_copy["entropy"].to_list()
