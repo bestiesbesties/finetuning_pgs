@@ -6,7 +6,8 @@ from ensemble import infer, calculations, confidence, save
 CRF_LABEL_COUNT = 8
 MAX_ENTROPY = calculations.calculate_entropy(torch.Tensor([1/CRF_LABEL_COUNT] * CRF_LABEL_COUNT))
 
-df = pd.read_csv(os.path.join("data", "hashed_chunks.csv"))
+# df = pd.read_csv(os.path.join("data", "hashed_chunks.csv"))
+df = pd.read_csv(os.path.join("data", "parsed-pgs33_pruned.csv"))
 
 while True:
     text = input(":")
