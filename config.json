@@ -1,4 +1,4 @@
 {
-    "seeds" : [801, 801, 801],
+    "seed" : 369, 
     "labels" : ["O", "B-ORG", "I-ORG", "B-ACT", "I-ACT", "B-RUL", "I-RUL", "B-PRO", "I-PRO", "B-DOC", "I-DOC"]
 }
