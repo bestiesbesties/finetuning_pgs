@@ -1,18 +1,8 @@
 import os
+from finTuning import general_helper
+CONFIG = general_helper.load_config()
 RANDOM_STATE = 800
-LABELS = [
-    "O",
-    "B-ORG",
-    "I-ORG",
-    "B-ACT",
-    "I-ACT",
-    "B-RUL",
-    "I-RUL",
-    "B-PRO",
-    "I-PRO",
-    "B-DOC",
-    "I-DOC"
-]
+LABELS = CONFIG["labels"]
 MODEL_PATH ="./models/robbert-v2-dutch-ner"
 DATA_PATH = os.path.join("temp", "admin3.jsonl")
 
@@ -34,8 +24,8 @@ train_dataset = Dataset.from_list(data_helper.tokenize_data(train_data, tokenize
 test_dataset = Dataset.from_list(data_helper.tokenize_data(test_data, tokenizer, model))
 
 ## metrics & training
-SEED = 801  ## TODO pick from list
-LEARNING_RATE = 2e-5
+SEED = CONFIG["seed"]
+LEARNING_RATE = 0.00002
 BATCH_SIZE = 8
 EPOCHS = 4
 WEIGHT_DECAY = 0.01
@@ -43,3 +33,4 @@ from finTuning import training_helper
 trainer = training_helper.train(tokenizer, model, SEED, LEARNING_RATE, BATCH_SIZE, EPOCHS, WEIGHT_DECAY, train_dataset,  test_dataset)
 print("trainer.evaluate():", trainer.evaluate())
 
+model_helper.save_model(SEED, 0, tokenizer, trainer)
