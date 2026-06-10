@@ -1,0 +1,16 @@
+{
+    "uniform_random_state" : 100,
+    "block_test_size" : 0.25,
+    "block_undersample_size" : 300,
+    "base_model_name" : "robbert-v2-dutch-ner",
+    "export_model": "built/369b0",
+    "inference_endpoint" : "http://127.0.0.1:8081/inference",
+    "seeds" : [300, 600, 900], 
+    "labels" : ["O", "B-ORG", "I-ORG", "B-ACT", "I-ACT", "B-RUL", "I-RUL", "B-PRO", "I-PRO", "B-DOC", "I-DOC"],
+    "max_entropy" : 2.3979,
+    "folder_structure": ["main", "block", "run"],
+    "learning_rate" : 0.00002,
+    "batch_size" : 8,
+    "epochs" : 5 ,
+    "weight_decay" : 0.01
+}
