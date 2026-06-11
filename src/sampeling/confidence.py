@@ -15,12 +15,12 @@ def _get_id2label(model_path:str) -> dict:
 
 def _calculate_entropy(probs, eps=1e-12):
     probs = probs.clamp(min=eps) ## cast kleine waardes naar minimale waarde
-    entropy = -torch.sum(probs * torch.log(probs), dim=0) ## verzwak grote getallen zodat som kleiner wordt als ergens meer zekerheid aan toe is gekend
+    entropy = -torch.sum(probs * torch.log(probs), dim=-1) ## verzwak grote getallen zodat som kleiner wordt als ergens meer zekerheid aan toe is gekend
     return entropy
 
 def _token_detail(logits, id2label):
     logits = torch.Tensor(logits)
-    softmax = torch.softmax(logits, dim=0)
+    softmax = torch.softmax(logits, dim=-1)
     print("softmax: ", softmax)
     entropy = _calculate_entropy(softmax)
     print("entropy: ", entropy)
@@ -64,7 +64,7 @@ def _safe_mean(x, safe=0) :
     return sum(x) / len(x) if sum(x) > 0 else safe
 
 def _inverse_model_similairity(indeces, J): ## TODO further granularity
-        exp_indeces = list(range(indeces[0], indeces[1])) ## TODO exp to up
+        exp_indeces = list(range(indeces[0], indeces[1] + 1)) ## TODO exp to up
         print("exp_indeces: ", exp_indeces)
         x = [ J[j].to_list() for j in exp_indeces ] ## Take own rows (square matrix)
         print("x: ", x)
