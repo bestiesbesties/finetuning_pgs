@@ -16,7 +16,7 @@ class Encoder():
         print("model: ", self.model)
 
     def _scope_model_path(self) -> str:
-        model_path = "." + os.path.sep + os.path.join("models", self.model_source)
+        model_path = "." + os.path.sep + self.model_source
         if not os.path.exists(model_path):
             raise RuntimeError("Not in 'models' folder: ", model_path)
         return model_path

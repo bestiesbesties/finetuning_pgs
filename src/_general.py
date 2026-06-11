@@ -9,20 +9,16 @@ def _printer(iter):
     for i, v in enumerate(iter):
         print("i: ", i, "v: ", v)
 
-# def get_run(path):
-#     path = os.path.join(config["folder_structure"][:2], "run")
-#     _path = path
-#     count = 0
-#     found = False
-#     while os.path.isdir(_path):
-#         found = True
-#         _path = f"{path}{count}"
-#         count += 1
-#     if not found:
-#         os.makedirs(_path, exist_ok=True)
+import os
+from src._config import config
 
-    # print("Transforming run: ", count)
-    # return _path
+def get_last_id(path, addon):
+    count = 0
+    path = os.path.join(path, addon)
+    while os.path.isdir(f"{path}_{count}"):
+        print(count)
+        count += 1
+    return f"{path}_{count - 1 if count > 0 else count}"
 
 def _save_data_frames(x, mapping):
     for k, v in mapping.items():

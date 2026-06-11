@@ -1,3 +1,6 @@
+doccano==v1.8.4
+numpy==1.26.4
+pandas
 tika
 flask
 transformers
@@ -5,5 +8,5 @@ tiktoken
 SentencePiece
 protobuf
 torch
-pandas
-spacy
+evaluate
+marshmallow==3.19.0

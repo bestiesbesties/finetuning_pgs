@@ -29,6 +29,8 @@ def _drop_indeces(iter, drop):
     return [ x for i, x in enumerate(iter) if i not in drop ]
 
 def _offset_span(span, offset):
+    print("span: ", span)
+    print("offset: ", offset)
     s_t ,e_t, p = span
     s_c = int(offset[s_t][0])
     e_c = int(offset[e_t][1])

@@ -9,10 +9,10 @@ def _load_config():
 
 config = _load_config()
 
-def _ensure_folderpath(folderpath):
-    if not os.path.exists(folderpath):
-        print("folderpath does not exist: ", folderpath)
-        os.makedirs(folderpath)
+# def _ensure_folderpath(folderpath):
+#     if not os.path.exists(folderpath):
+#         print("folderpath does not exist: ", folderpath)
+#         os.makedirs(folderpath)
 
-_ensure_folderpath(os.path.join("models", "built"))
-_ensure_folderpath(os.path.join("temp"))
+# _ensure_folderpath(os.path.join("models", "built"))
+# _ensure_folderpath(os.path.join("temp"))

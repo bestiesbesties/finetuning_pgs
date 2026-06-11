@@ -21,33 +21,43 @@ def _calculate_entropy(probs, eps=1e-12):
 def _token_detail(logits, id2label):
     logits = torch.Tensor(logits)
     softmax = torch.softmax(logits, dim=0)
+    print("softmax: ", softmax)
     entropy = _calculate_entropy(softmax)
+    print("entropy: ", entropy)
 
     argmax = torch.argmax(logits)
+    print("argmax: ", argmax)
     token_pred = id2label[str(argmax.tolist())] ## TODO value instead of tolist 
 
     return entropy, token_pred
 
-## inject FROM TPS
-def _group_bio(preds): ## TODO span(s) should be groups
+## TODO un-inject FROM TPS
+def _group_bio(preds):
     spans = []
     start = None
-    span_tag =  None ## TODO must must be approached differently, list with majority vote perhaps?
-    for token_id, pred in enumerate(preds):
-        label = pred
-        tag = label.split("-")[-1]
-        ## Sla 'Outside' labels over, maar als er al een groep gevonden was sluit de vorige groep wel af 
+    current_tag = None
+
+    for i, label in enumerate(preds):
         if label == "O":
-            if start and span_tag :
-                spans.append((start, token_id - 1, span_tag))
+            if start is not None:
+                spans.append((start, i - 1, current_tag))
                 start = None
-                span_tag = None
+                current_tag = None
             continue
 
-        ## Eerste token van een nieuwe groep opslaan
+        tag = label.split("-", 1)[-1]  # DOC, ACT, etc.
+
         if start is None:
-            start = token_id
-            span_tag = tag
+            start = i
+            current_tag = tag
+        elif tag != current_tag:
+            spans.append((start, i - 1, current_tag))
+            start = i
+            current_tag = tag
+
+    if start is not None:
+        spans.append((start, len(preds) - 1, current_tag))
+
     return spans
 
 def _safe_mean(x, safe=0) :
@@ -80,6 +90,8 @@ def _sequence_detail(text, id2label):
 
 def route(text, model_path):
     sequence_detail = _sequence_detail(text, _get_id2label(model_path))
+    print("sequence_detail: ", sequence_detail)
+    print(_get_id2label(model_path))
     J = pd.DataFrame(jaccard._matrix(sequence_detail))
     print(J)
     sequence_indeces = jaccard._get_matrix_indeces(sequence_detail)
@@ -92,8 +104,11 @@ def route(text, model_path):
     conf =  ( 1 - normalized_sequence_entropy ) *  sequence_similairity
     ## PRED
     sequence_preds = [ group for key in sequence_detail.keys() for group in sequence_detail[key]["groups"] ]
+    print("sequence_preds: ", sequence_preds)
     clusters = voting.cluster_spans(J)
+    print("clusters: ", clusters)
     pred = [ voting.aggregate_cluster(sequence_preds, cluster) for cluster in clusters ]
+    print("pred: ", pred)
     pred = [ jaccard._offset_span(x, sequence_detail["300A"]["offsets"]) for x in pred ]
     print("conf: ", conf)
     print("pred: ", pred)
