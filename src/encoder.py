@@ -3,7 +3,7 @@ from transformers import AutoModelForTokenClassification, AutoTokenizer
 import torch
 print("!> !> !> Forcing MPS (Apple) if available with CPU fallback on condition")
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-BATCH = 0
+BATCH = 0 ## TODO force batch gone
 
 class Encoder():
     def __init__(self, model_source):
@@ -13,7 +13,6 @@ class Encoder():
         self.model = AutoModelForTokenClassification.from_pretrained(self.model_path, local_files_only=True)
         self.model.to(DEVICE)
         print("model_class: ", self.model.__class__)
-        print("model: ", self.model)
 
     def _scope_model_path(self) -> str:
         model_path = "." + os.path.sep + self.model_source
