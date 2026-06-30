@@ -3,7 +3,7 @@ from . import jaccard
 
 def aggregate_cluster(preds, cluster):
     cluster = [ preds[i] for i in cluster ] ## grab model group from clustered relative id
-    print("cluster: ", cluster)
+    # print("cluster: ", cluster)
     labels = [s[2] for s in cluster]
     label = Counter(labels).most_common(1)[0][0]
 
