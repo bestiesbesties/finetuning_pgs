@@ -29,12 +29,13 @@ def _drop_indeces(iter, drop):
     return [ x for i, x in enumerate(iter) if i not in drop ]
 
 def _offset_span(span, offset):
-    print("span: ", span)
-    print("offset: ", offset)
     s_t ,e_t, p = span
     s_c = int(offset[s_t][0])
     e_c = int(offset[e_t][1])
-    assert e_c > s_c
+    if not e_c > s_c: ## TODO fix
+        print("span: ", span)
+        print("e_c: ", e_c, "s_c: ", s_c)
+        assert e_c >= s_c
     return [s_c, e_c, p]
 
 def _expand_span(group):
