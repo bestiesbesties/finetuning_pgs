@@ -1,7 +1,9 @@
 from transformers import TrainingArguments, Trainer, DataCollatorForTokenClassification
 import numpy as np
 import evaluate
+from collections import Counter
 seqeval = evaluate.load("seqeval")
+from ..labeling import serialization
 
 from .._config import config
 
@@ -16,36 +18,45 @@ def train(tokenizer, model, train_dataset, test_dataset):
         weight_decay=config["weight_decay"],
         save_strategy="epoch",
         eval_strategy="epoch",
+        dataloader_pin_memory=False,
     )
+
+    # print("train id2label: ", model.config.id2label)
+    # print("train label2id: ", model.config.label2id)
 
     def _compute_metrics(p):
         predictions, labels = p
 
         predictions = np.argmax(predictions, axis=2)
 
-        true_predictions = []
-        true_labels = []
+        true_preds = []
+        true_golds = []
 
         for pred, lab in zip(predictions, labels):
-
-            current_preds = []
-            current_labels = []
-
-            for p_i, l_i in zip(pred, lab):
-
-                if l_i == -100:
+            for p, l in zip(pred, lab):
+                if l == -100:
                     continue
-
-                current_preds.append(model.config.id2label[p_i])
-                current_labels.append(model.config.id2label[l_i])
-
-            true_predictions.append(current_preds)
-            true_labels.append(current_labels)
+                true_preds.append(model.config.id2label[p])
+                true_golds.append(model.config.id2label[l])
 
         results = seqeval.compute(
-            predictions=true_predictions,
-            references=true_labels
+            predictions=[true_preds],
+            references=[true_golds],
+            zero_division=0
         )
+
+        print("SAVING METRICS + DEBUG")
+        
+        serialization.export_results_iteratively({
+                "precision" : round(results["overall_precision"], 4),
+                "recall" : round(results["overall_recall"], 4),
+                "f1" : round(results["overall_f1"], 4),
+                "accuracy" : round(results["overall_accuracy"], 4),
+                "GOLD" : Counter(true_golds),
+                "PREDS" : Counter(true_preds),
+                "ENTITY RATE -> gold" : sum(t != "O" for t in true_golds),
+                "| pred" : sum(t != "O" for t in true_preds)
+            })
 
         return {
             "precision": results["overall_precision"],
