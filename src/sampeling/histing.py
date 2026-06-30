@@ -15,4 +15,4 @@ def stratified_sample(df, N):
     final_idx = low_indeces.union(high_indeces).union(rand_indeces)
     final_idx = pd.Index(final_idx).to_series().sample(n=N).index
 
-    return df.loc[final_idx].reset_index(drop=True)
+    return df.loc[final_idx]
